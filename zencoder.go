@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"time"
 )
@@ -66,7 +65,7 @@ func NewClient(options *Options) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) Zencode(input string, outputs []map[string]interface{}) (map[string]interface{}, error) {
+func (c *Client) Zencode(ctx appengine.Context, input string, outputs []map[string]interface{}) (map[string]interface{}, error) {
 	outputsStr, err := json.Marshal(outputs)
 	if err != nil {
 		return nil, err
@@ -80,11 +79,7 @@ func (c *Client) Zencode(input string, outputs []map[string]interface{}) (map[st
 		req.Header.Add("Content-Type", c.responseType)
 		req.Header.Add("Zencoder-Api-Key", c.apiKey)
 
-		tr := &urlfetch.Transport{
-			Dial: func(network, addr string) (net.Conn, error) {
-				return net.DialTimeout(network, addr, time.Duration(c.timeout)*time.Second)
-			},
-		}
+		tr := &urlfetch.Transport{Context: ctx, Deadline: time.Duration(30) * time.Second}
 
 		if res, err := tr.RoundTrip(req); err != nil {
 			return nil, err
