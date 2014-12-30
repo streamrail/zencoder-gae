@@ -76,11 +76,11 @@ func (c *Client) Zencode(ctx appengine.Context, input string, outputs []map[stri
 	}
 	reqStr := ""
 	if notifications != nil && len(notifications) > 0 {
-		reqStr = fmt.Sprintf("{\"input\":\"%s\",\"output\":%s\", \"notifications\":%s}", input, outputsStr, notificationsStr)
+		reqStr = fmt.Sprintf("{\"input\":\"%s\",\"output\":%s, \"notifications\":%s}", input, outputsStr, notificationsStr)
 	} else {
 		reqStr = fmt.Sprintf("{\"input\":\"%s\",\"output\":%s\"}", input, outputsStr)
 	}
-	fmt.Printf("reqStr: %s", reqStr)
+	ctx.Infof("reqStr: %s", reqStr)
 	if req, err := http.NewRequest("POST", c.apiEndpoint,
 		bytes.NewBuffer([]byte(reqStr))); err != nil {
 		return nil, err
