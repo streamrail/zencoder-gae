@@ -1,11 +1,12 @@
 package zencoder
 
 import (
-	"appengine"
-	"appengine/urlfetch"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/urlfetch"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -65,7 +66,7 @@ func NewClient(options *Options) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) Zencode(ctx appengine.Context, input string, outputs []map[string]interface{}, notifications []string) (map[string]interface{}, error) {
+func (c *Client) Zencode(ctx context.Context, input string, outputs []map[string]interface{}, notifications []string) (map[string]interface{}, error) {
 	outputsStr, err := json.Marshal(outputs)
 	if err != nil {
 		return nil, err
@@ -80,7 +81,7 @@ func (c *Client) Zencode(ctx appengine.Context, input string, outputs []map[stri
 	} else {
 		reqStr = fmt.Sprintf("{\"input\":\"%s\",\"output\":%s\"}", input, outputsStr)
 	}
-	ctx.Infof("reqStr: %s", reqStr)
+	log.Infof(ctx, "reqStr: %s", reqStr)
 	if req, err := http.NewRequest("POST", c.apiEndpoint,
 		bytes.NewBuffer([]byte(reqStr))); err != nil {
 		return nil, err
